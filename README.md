@@ -305,40 +305,72 @@ Intermediary and output compression ?
 
 <details><summary><b>Answer</b></summary>
 
-Using compression has the advantage of minimizing the disk space required for files
-and the overhead of disk and network I/O. However, compressing and decompressing
-files increases the CPU overhead. Therefore, compression is best used for I/O-bound
-jobs, where there is extra CPU capacity, or when disk space is at a premium.
+![Image](img/intermediaryCompression.png "intermediaryCompression")
 
-All recent versions of Hadoop have built-in support for the GZip and BZip2 compres-
-sion schemes, including native Linux libraries that accelerate compression and decom-
-pression for these formats. Bundled support for Snappy compression was recently
-added, but if your version of Hadoop doesn’t support it, you can add the appropriate
-libraries yourself. 
+![Image](img/finalCompression.png "finalCompression")
 
-Finally, LZO compression is often used. 2
-So, why do we need different compression schemes? Each scheme makes a trade-off
-between speed and minimizing the size of the compressed output. BZip2 creates the
-smallest compressed output, but with the highest CPU overhead. GZip is next in terms
-of compressed size versus speed. Hence, if disk space utilization and I/O overhead are
-concerns, both are attractive choices.
+</details>
 
+<details><summary><b>Source</b></summary>
+programming hive
+</details>
 
-LZO and Snappy create larger files but are much faster, especially for decompression.
-They are good choices if disk space and I/O overhead are less important than rapid
-decompression of frequently read data.
-Another important consideration is whether or not the compression format is splitta-
-ble. MapReduce wants to split very large input files into splits (often one split per filesystem block, i.e., a multiple of 64 MB), where each split is sent to a separate map
-process. This can only work if Hadoop knows the record boundaries in the file. In text
-files, each line is a record, but these boundaries are obscured by GZip and Snappy.
-However, BZip2 and LZO provide block-level compression, where each block has
-complete records, so Hadoop can split these files on block boundaries.
+### Theorical Question 14
 
+schema evolution
 
-The desire for splittable files doesn’t rule out GZip and Snappy. When you create your
-data files, you could partition them so that they are approximately the desired size.
-Typically the number of output files is equal to the number of reducers. If you are using N reducers you typically get N output files. Be careful, if you have a large nonsplittable
-file, a single task will have to read the entire file beginning to end.
+<details><summary><b>Answer</b></summary>
+
+Over time fields may be added or deprecated from data sets. Avro is designed with this
+in mind. An evolving schema is one that changes over time. Avro allows fields to be
+null. It also allows for default values to be returned if the column is not defined in the
+data file.
+For example, if the Avro schema is changed and a field added, the default field supplies
+a value if the column is not found:
+
+{
+"name":"extra_field",
+"type":"string",
+"doc:":"an extra field not in the original file",
+"default":"fishfingers and custard"
+}
+
+</details>
+
+<details><summary><b>Source</b></summary>
+programming hive
+</details>
+
+### Theorical Question 15
+
+Do you know what Hive Thrift Service is for ?
+
+<details><summary><b>Answer</b></summary>
+
+![Image](img/hivethricht.png "hivethricht")
+
+</details>
+
+<details><summary><b>Source</b></summary>
+programming hive
+</details>
+
+### Theorical Question 16
+
+What is locking in hive ?
+
+<details><summary><b>Answer</b></summary>
+
+While HiveQL is an SQL dialect, Hive lacks the traditional support for locking on a
+column, row, or query, as typically used with update or insert queries. Files in Hadoop
+are traditionally write-once (although Hadoop does support limited append seman-
+tics). Because of the write-once nature and the streaming style of MapReduce, access
+to fine-grained locking is unnecessary.
+
+However, since Hadoop and Hive are multi-user systems, locking and coordination are
+valuable in some situations. For example, if one user wishes to lock a table, because an
+INSERT OVERWRITE query is changing its content, and a second user attempts to issue a
+query against the table at the same time, the query could fail or yield invalid results.
 
 </details>
 

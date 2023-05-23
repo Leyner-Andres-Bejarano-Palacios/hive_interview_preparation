@@ -99,3 +99,93 @@ ture with managed tables.
 <details><summary><b>Source</b></summary>
 programming hive
 </details>
+
+### Theorical Question 6
+
+How can you recover a deleted managed deleted table ?
+
+<details><summary><b>Answer</b></summary>
+
+if you enable the Hadoop Trash feature, which is not on by
+default, the data is moved to the .Trash directory in the distributed
+filesystem for the user, which in HDFS is /user/$USER/.Trash. To enable
+this feature, set the property fs.trash.interval to a reasonable positive
+number. It’s the number of minutes between “trash checkpoints”; 1,440
+would be 24 hours. While it’s not guaranteed to work for all versions of
+all distributed filesystems, if you accidentally drop a managed table with
+important data, you may be able to re-create the table, re-create any
+partitions, and then move the files from .Trash to the correct directories
+(using the filesystem commands) to restore the data.
+
+</details>
+
+<details><summary><b>Source</b></summary>
+programming hive
+</details>
+
+### Theorical Question 7
+
+How can you specify that the location of a table changed ?
+
+<details><summary><b>Answer</b></summary>
+
+you can change a partition location, effectively moving it:
+ALTER TABLE log_messages PARTITION(year = 2011, month = 12, day = 2)
+SET LOCATION 's3n://ourbucket/logs/2011/01/02';
+
+This command does not move the data from the old location, nor does it delete the old
+data.
+Finally, you can drop a partition:
+
+ALTER TABLE log_messages DROP IF EXISTS PARTITION(year = 2011, month = 12, day = 2);
+The IF EXISTS clause is optional, as usual. For managed tables, the data for the partition is deleted, along with the metadata, even if the partition was created using ALTER TABLE ... ADD PARTITION . For external tables, the data is not deleted.
+
+</details>
+
+<details><summary><b>Source</b></summary>
+programming hive
+</details>
+
+
+### Theorical Question 8
+
+How do we load data into hive ?
+
+<details><summary><b>Answer</b></summary>
+
+Since Hive has no row-level insert, update, and delete operations, the only way to put
+data into an table is to use one of the “bulk” load operations. Or you can just write files in the correct directories by other means.
+
+LOAD DATA LOCAL INPATH '${env:HOME}/california-employees'
+OVERWRITE INTO TABLE employees
+PARTITION (country = 'US', state = 'CA');
+
+This command will first create the directory for the partition, if it doesn’t already exist, then copy the data to it. If the target table is not partitioned, you omit the PARTITION clause.
+
+If the LOCAL keyword is used, the path is assumed to be in the local filesystem. The data is copied into the final location. If LOCAL is omitted, the path is assumed to be in the distributed filesystem. In this case, the data is moved from the path to the final location.
+
+
+INSERT OVERWRITE TABLE employees
+PARTITION (country = 'US', state = 'OR')
+SELECT * FROM staged_employees se
+WHERE se.cnty = 'US' AND se.st = 'OR';
+
+
+The INSERT statement lets you load data into a table from a query. Reusing our employ
+ees example from the previous chapter, here is an example for the state of Oregon,
+where we presume the data is already in another table called staged_employees . For
+reasons we’ll discuss shortly, let’s use different names for the country and state fields in staged_employees , calling them cnty and st , respectively:
+
+There’s still one problem with this syntax: if you have a lot of partitions to create, you have to write a lot of SQL! Fortunately, Hive also supports a dynamic partition feature, where it can infer the partitions to create based on query parameters. By comparison, up until now we have considered only static partitions.
+
+INSERT OVERWRITE TABLE employees
+PARTITION (country, state)
+SELECT ..., se.cnty, se.st
+FROM staged_employees se;
+
+
+</details>
+
+<details><summary><b>Source</b></summary>
+programming hive
+</details>

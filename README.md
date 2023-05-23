@@ -189,3 +189,65 @@ FROM staged_employees se;
 <details><summary><b>Source</b></summary>
 programming hive
 </details>
+
+### Theorical Question 9
+
+When should you use indexes in hive ?
+
+<details><summary><b>Answer</b></summary>
+
+Hive has limited indexing capabilities. There are no keys in the usual relational database sense, but you can build an index on columns to speed some operations. 
+
+The index data for a table is stored in another table.
+Also, the feature is relatively new, so it doesn’t have a lot of options yet. However, the indexing process is designed to be customizable with plug-in Java code, so teams can
+extend the feature to meet their needs.
+
+Indexing is also a good alternative to partitioning when the logical partitions would
+actually be too numerous and small to be useful. Indexing can aid in pruning some
+blocks from a table as input for a MapReduce job. Not all queries can benefit from an
+index—the EXPLAIN syntax and Hive can be used to determine if a given query is aided
+by an index.
+
+Indexes in Hive, like those in relational databases, need to be evaluated carefully.
+Maintaining an index requires extra disk space and building an index has a processing
+cost. The user must weigh these costs against the benefits they offer when querying a
+table.
+
+</details>
+
+<details><summary><b>Source</b></summary>
+programming hive
+</details>
+
+### Theorical Question 10
+
+How would you activate parallel mode hive ?
+
+<details><summary><b>Answer</b></summary>
+
+![Image](img/parallelExecution.png "parallelExecution")
+
+</details>
+
+<details><summary><b>Source</b></summary>
+programming hive
+</details>
+
+
+### Theorical Question 11
+
+Number of mappers and reducers ?
+
+<details><summary><b>Answer</b></summary>
+
+![Image](img/mappersReducers.png "mappersReducers")
+
+![Image](img/mappersReducers_Part2.png "mappersReducers_Part2")
+
+![Image](img/mappersReducers_part3.png "mappersReducers_part3")
+
+</details>
+
+<details><summary><b>Source</b></summary>
+programming hive
+</details>

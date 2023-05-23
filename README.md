@@ -43,3 +43,59 @@ strings, it will return nulls for those fields. Above all else, Hive tries to re
 <details><summary><b>Source</b></summary>
 programming hive
 </details>
+
+### Theorical Question 3
+
+What commands would you use in hive if givena table you want to get info about:
+
+- Partition Information
+- Retention
+- Location
+- Compressed
+
+<details><summary><b>Answer</b></summary>
+
+DESCRIBE FORMATTED
+
+</details>
+
+<details><summary><b>Source</b></summary>
+https://docs.cloudera.com/HDPDocuments/HDP3/HDP-3.0.1/materialized-view/content/hive_describe_materialized_view.html
+</details>
+
+### Theorical Question 4
+
+What is the difference between managed/internal tables and external tables ?
+
+<details><summary><b>Answer</b></summary>
+
+The tables we have created so far are called managed tables or sometimes called inter-
+nal tables, because Hive controls the lifecycle of their data (more or less). As we’ve seen, Hive stores the data for these tables in a subdirectory under the directory defined by hive.metastore.warehouse.dir (e.g., /user/hive/warehouse), by default.
+When we drop a managed table  Hive deletes the data in the table.
+
+</details>
+
+<details><summary><b>Source</b></summary>
+programming hive
+</details>
+
+
+### Theorical Question 5
+
+When would you use the hive command ALTER TABLE ... ADD PARTITION ?
+
+<details><summary><b>Answer</b></summary>
+
+ALTER TABLE ... ADD PARTITION is not limited to external tables. You can use it with
+managed tables, too, when you have (or will have) data for partitions in directories
+created outside of the LOAD and INSERT options we discussed above. You’ll need to
+remember that not all of the table’s data will be under the usual Hive “warehouse”
+directory, and this data won’t be deleted when you drop the managed table! Hence,
+from a “sanity” perspective, it’s questionable whether you should dare to use this fea-
+ture with managed tables.
+
+</details>
+
+<details><summary><b>Source</b></summary>
+programming hive
+</details>
